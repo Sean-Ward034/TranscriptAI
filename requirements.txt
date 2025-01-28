@@ -1,0 +1,4 @@
+kivy
+python-docx
+openai-whisper
+torch
