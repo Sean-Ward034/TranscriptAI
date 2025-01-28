@@ -1,24 +1,70 @@
-## **How to Use**
+# **Setup Guide**
 
-**Install** dependencies from `requirements.txt` directly:  
-bash  
-CopyEdit  
-`pip install -r requirements.txt`  
-or  
-bash  
-CopyEdit  
-`pip install .`
+## **Prerequisites**
 
-1. in the directory containing `setup.py`.
+1. **Python Environment**
+   * Python 3.8 or newer
+   * pip package manager
 
-**Ensure FFmpeg** is installed separately and on your PATH:  
-bash  
-CopyEdit  
-`ffmpeg -version`  
-`ffprobe -version`
+2. **FFmpeg Installation**
+   * Windows: Download from [ffmpeg.org](https://ffmpeg.org/download.html)
+   * Linux: `sudo apt install ffmpeg` (Ubuntu/Debian)
+   * macOS: `brew install ffmpeg` (using Homebrew)
 
-2. If you see version info, you’re set.  
-3. **Run** your main Python script (e.g., `python audio_2_word_app.py`) after installing dependencies.
+## **Installation Steps**
 
-That’s it\! This approach is **general**, avoids version pinning, and helps prevent confusion about version conflicts.
+1. **Clone Repository**
+   ```bash
+   git clone <repository-url>
+   cd audio2word
+   ```
 
+2. **Install Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+   Or install as a package:
+   ```bash
+   pip install .
+   ```
+
+3. **Verify Installation**
+   ```bash
+   # Check FFmpeg
+   ffmpeg -version
+   ffprobe -version
+   
+   # Run the application
+   python main.py
+   ```
+
+## **Development Setup**
+
+1. **Create Virtual Environment** (recommended)
+   ```bash
+   python -m venv venv
+   # Windows
+   venv\Scripts\activate
+   # Unix/macOS
+   source venv/bin/activate
+   ```
+
+2. **Install Development Dependencies**
+   ```bash
+   pip install -e .
+   ```
+
+## **Troubleshooting**
+
+1. **FFmpeg Not Found**
+   * Ensure FFmpeg is in your system PATH
+   * Restart your terminal after installing FFmpeg
+   * On Windows, you might need to log out and back in
+
+2. **CUDA/GPU Issues**
+   * Install PyTorch with CUDA support if needed
+   * Verify CUDA installation: `python -c "import torch; print(torch.cuda.is_available())"`
+
+3. **Kivy Installation**
+   * If Kivy fails to install, check [Kivy's installation guide](https://kivy.org/doc/stable/installation/installation.html)
+   * You might need additional system packages depending on your OS

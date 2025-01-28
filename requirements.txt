@@ -1,4 +1,6 @@
-kivy
-python-docx
-openai-whisper
-torch
+kivy>=2.1.0
+python-docx>=0.8.11
+openai-whisper>=20230314
+torch>=2.0.0
+python-tkinter>=3.8.0
+docx-stubs>=0.0.1-7  # For better type hints
