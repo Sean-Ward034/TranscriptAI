@@ -9,6 +9,10 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from .ffmpeg_utils import convert_to_wav_ffmpeg, chunk_wav_file
 from .whisper_utils import load_whisper_model, transcribe_audio_segment, format_timecode
 
+# NEW: import our audio enhancement function
+from .audio_enhancement import enhance_audio
+
+
 class TranscriptionWorker(threading.Thread):
     """Process multiple files in a background thread."""
     
@@ -23,7 +27,8 @@ class TranscriptionWorker(threading.Thread):
         chunk: bool = True,
         chunk_length: int = 300,
         log_queue: Optional[queue.Queue] = None,
-        progress_queue: Optional[queue.Queue] = None
+        progress_queue: Optional[queue.Queue] = None,
+        enhance_audio: bool = False,  # <-- NEW: toggle for enhancement
     ):
         super().__init__()
         self.input_files = input_files
@@ -38,6 +43,9 @@ class TranscriptionWorker(threading.Thread):
         self.progress_queue = progress_queue
         self.stop_event = threading.Event()
         self.doc_messages = []
+        
+        # NEW: store the user preference
+        self.enhance_audio_flag = enhance_audio
 
     def _log(self, msg: str) -> None:
         """Helper to push log messages to queue or print."""
@@ -63,6 +71,8 @@ class TranscriptionWorker(threading.Thread):
         details.add_run(f"Channels: {self.channels}\n")
         if self.chunk:
             details.add_run(f"Chunk Length: {self.chunk_length} seconds\n")
+        if self.enhance_audio_flag:
+            details.add_run("Audio Enhancement: Enabled\n")
         
         # Add a separator
         doc.add_paragraph("=" * 80)
@@ -120,7 +130,7 @@ class TranscriptionWorker(threading.Thread):
             # Create new document for this file
             doc = self._create_document(f)
             
-            # Convert to WAV
+            # 1) Convert to WAV
             wav_file = convert_to_wav_ffmpeg(
                 f,
                 self.sample_rate,
@@ -131,7 +141,7 @@ class TranscriptionWorker(threading.Thread):
                 self._log(f"WAV conversion failed for '{f}'. Skipping.")
                 continue
 
-            # Split into chunks if needed
+            # 2) Split into chunks if needed
             if self.chunk:
                 chunks = chunk_wav_file(
                     wav_file,
@@ -141,25 +151,41 @@ class TranscriptionWorker(threading.Thread):
             else:
                 chunks = [wav_file]
 
-            # Process all chunks
+            # 3) Process all chunks
             all_segments = []
             for chunk_idx, chunk_path in enumerate(chunks, start=1):
                 if self.stop_event.is_set():
                     self._log("Stop requested during chunk processing.")
                     break
                 
-                self._log(f"Transcribing chunk {chunk_idx}/{len(chunks)}")
+                # NEW: Enhance audio if user selected
+                if self.enhance_audio_flag:
+                    self._log(f"Enhancing chunk {chunk_idx}/{len(chunks)}...")
+                    try:
+                        # Example: no custom sample_rate override or prop_decrease
+                        enhanced_path = enhance_audio(chunk_path)
+                        audio_to_transcribe = enhanced_path
+                    except Exception as e:
+                        audio_to_transcribe = chunk_path
+                        self._log(f"Enhancement failed: {e}. Using original audio.")
+                else:
+                    audio_to_transcribe = chunk_path
+
+                self._log(f"Transcribing chunk {chunk_idx}/{len(chunks)}...")
                 result = transcribe_audio_segment(
                     model,
-                    chunk_path,
+                    audio_to_transcribe,
                     verbose=True,
                     log_queue=self.log_queue
                 )
                 
                 # Add segments to document
                 for segment in result["segments"]:
-                    self._add_segment_to_doc(doc, segment, 
-                                          chunk_idx if len(chunks) > 1 else None)
+                    self._add_segment_to_doc(
+                        doc,
+                        segment,
+                        chunk_idx if len(chunks) > 1 else None
+                    )
                 all_segments.extend(result["segments"])
 
             # Add processing log if we have messages
