@@ -141,7 +141,15 @@ class MainGUI(BoxLayout):
         adv_layout.add_widget(Label(text="Chunk Length (seconds):", halign="right"))
         self.chunk_length_input = TextInput(text="300", multiline=False)
         adv_layout.add_widget(self.chunk_length_input)
-        
+
+        # NEW: Audio Enhancement
+        adv_layout.add_widget(Label(text="Enhance Audio:", halign="right"))
+        self.enhance_spinner = Spinner(
+            text="No",
+            values=["Yes", "No"]
+        )
+        adv_layout.add_widget(self.enhance_spinner)
+
         self.add_widget(adv_layout)
 
         # Control buttons
@@ -242,6 +250,9 @@ class MainGUI(BoxLayout):
             chunk_len = 300
             self._log("Invalid chunk length, defaulting to 300 seconds.")
 
+        # Enhance audio or not
+        enhance_audio_flag = (self.enhance_spinner.text == "Yes")
+
         # Reset UI state
         self.log_output.text = ""
         self.progress_bar.value = 0
@@ -257,6 +268,10 @@ class MainGUI(BoxLayout):
             f"Chunking: {self.chunk_spinner.text == 'Yes'} "
             f"(chunk size = {chunk_len}s)\n"
         )
+        if enhance_audio_flag:
+            self._log("Audio enhancement: ENABLED")
+        else:
+            self._log("Audio enhancement: disabled")
 
         self.worker = TranscriptionWorker(
             input_files=self.input_files,
@@ -265,10 +280,11 @@ class MainGUI(BoxLayout):
             device=self.device_spinner.text,
             sample_rate=sr_val,
             channels=ch_val,
-            chunk=self.chunk_spinner.text == "Yes",
+            chunk=(self.chunk_spinner.text == "Yes"),
             chunk_length=chunk_len,
             log_queue=self.log_queue,
-            progress_queue=self.progress_queue
+            progress_queue=self.progress_queue,
+            enhance_audio=enhance_audio_flag  # <-- pass it here
         )
         self.worker.start()
 
