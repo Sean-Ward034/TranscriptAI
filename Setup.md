@@ -7,9 +7,17 @@
    * pip package manager
 
 2. **FFmpeg Installation**
-   * Windows: Download from [ffmpeg.org](https://ffmpeg.org/download.html)
-   * Linux: `sudo apt install ffmpeg` (Ubuntu/Debian)
-   * macOS: `brew install ffmpeg` (using Homebrew)
+   * Windows:
+     - Download from [ffmpeg.org](https://ffmpeg.org/download.html)
+     - Extract the archive
+     - Add the bin folder to your system PATH
+     - Restart your terminal/application
+   * Linux:
+     - Ubuntu/Debian: `sudo apt install ffmpeg`
+     - Fedora/RHEL: `sudo yum install ffmpeg`
+     - Arch: `sudo pacman -S ffmpeg`
+   * macOS:
+     - Using Homebrew: `brew install ffmpeg`
 
 ## **Installation Steps**
 
@@ -57,7 +65,8 @@
 ## **Troubleshooting**
 
 1. **FFmpeg Not Found**
-   * Ensure FFmpeg is in your system PATH
+   * The application will provide platform-specific installation instructions
+   * After installing FFmpeg, ensure it's in your system PATH
    * Restart your terminal after installing FFmpeg
    * On Windows, you might need to log out and back in
 
@@ -65,6 +74,6 @@
    * Install PyTorch with CUDA support if needed
    * Verify CUDA installation: `python -c "import torch; print(torch.cuda.is_available())"`
 
-3. **Kivy Installation**
-   * If Kivy fails to install, check [Kivy's installation guide](https://kivy.org/doc/stable/installation/installation.html)
+3. **Qt Installation**
+   * If Qt fails to install, check your Python version compatibility
    * You might need additional system packages depending on your OS

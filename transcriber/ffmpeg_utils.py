@@ -1,6 +1,33 @@
 import os
 import subprocess
+import shutil
 from typing import List, Optional
+
+def _check_ffmpeg_installed() -> bool:
+    """Check if FFmpeg is available in system PATH."""
+    return bool(shutil.which('ffmpeg')) and bool(shutil.which('ffprobe'))
+
+def _get_ffmpeg_install_instructions() -> str:
+    """Get platform-specific installation instructions for FFmpeg."""
+    if os.name == 'nt':  # Windows
+        return """FFmpeg not found. Please install FFmpeg:
+1. Download from https://ffmpeg.org/download.html#build-windows
+2. Extract the archive
+3. Add the bin folder to your system PATH
+4. Restart your terminal/application"""
+    else:  # Unix-like
+        if shutil.which('apt'):
+            return "FFmpeg not found. Install with: sudo apt install ffmpeg"
+        elif shutil.which('brew'):
+            return "FFmpeg not found. Install with: brew install ffmpeg"
+        elif shutil.which('yum'):
+            return "FFmpeg not found. Install with: sudo yum install ffmpeg"
+        return "FFmpeg not found. Please install FFmpeg using your system's package manager."
+
+def _verify_ffmpeg() -> None:
+    """Verify FFmpeg is available or raise informative error."""
+    if not _check_ffmpeg_installed():
+        raise RuntimeError(_get_ffmpeg_install_instructions())
 
 def _log_subprocess_error(e: subprocess.CalledProcessError, log_queue=None) -> None:
     """Log subprocess errors with stdout/stderr details."""
@@ -29,6 +56,8 @@ def convert_to_wav_ffmpeg(
     log_queue = None
 ) -> Optional[str]:
     """Convert audio/video file to WAV format using FFmpeg."""
+    _verify_ffmpeg()  # Check FFmpeg availability first
+    
     base, ext = os.path.splitext(input_file)
     if ext.lower() == ".wav":
         if log_queue:
@@ -59,6 +88,8 @@ def convert_to_wav_ffmpeg(
 
 def get_duration_seconds(file_path: str, log_queue = None) -> float:
     """Get audio duration in seconds using ffprobe."""
+    _verify_ffmpeg()  # Check FFmpeg availability first
+    
     cmd = [
         "ffprobe", "-v", "error",
         "-show_entries", "format=duration",
@@ -85,6 +116,8 @@ def chunk_wav_file(
     log_queue = None
 ) -> List[str]:
     """Split WAV file into chunks using FFmpeg segments."""
+    _verify_ffmpeg()  # Check FFmpeg availability first
+    
     total_duration = get_duration_seconds(file_path, log_queue=log_queue)
     if total_duration <= 0:
         if log_queue:
