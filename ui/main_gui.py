@@ -142,13 +142,21 @@ class MainGUI(BoxLayout):
         self.chunk_length_input = TextInput(text="300", multiline=False)
         adv_layout.add_widget(self.chunk_length_input)
 
-        # NEW: Audio Enhancement
+        # Audio Enhancement
         adv_layout.add_widget(Label(text="Enhance Audio:", halign="right"))
         self.enhance_spinner = Spinner(
             text="No",
             values=["Yes", "No"]
         )
         adv_layout.add_widget(self.enhance_spinner)
+
+        # NEW: Diarization option
+        adv_layout.add_widget(Label(text="Enable Diarization:", halign="right"))
+        self.diarization_spinner = Spinner(
+            text="No",
+            values=["Yes", "No"]
+        )
+        adv_layout.add_widget(self.diarization_spinner)
 
         self.add_widget(adv_layout)
 
@@ -252,6 +260,8 @@ class MainGUI(BoxLayout):
 
         # Enhance audio or not
         enhance_audio_flag = (self.enhance_spinner.text == "Yes")
+        # NEW: Diarization flag from spinner
+        diarization_flag = (self.diarization_spinner.text == "Yes")
 
         # Reset UI state
         self.log_output.text = ""
@@ -272,6 +282,10 @@ class MainGUI(BoxLayout):
             self._log("Audio enhancement: ENABLED")
         else:
             self._log("Audio enhancement: disabled")
+        if diarization_flag:
+            self._log("Speaker diarization: ENABLED")
+        else:
+            self._log("Speaker diarization: disabled")
 
         self.worker = TranscriptionWorker(
             input_files=self.input_files,
@@ -284,7 +298,8 @@ class MainGUI(BoxLayout):
             chunk_length=chunk_len,
             log_queue=self.log_queue,
             progress_queue=self.progress_queue,
-            enhance_audio=enhance_audio_flag  # <-- pass it here
+            enhance_audio=enhance_audio_flag,
+            enable_diarization=diarization_flag  # <-- pass diarization option here
         )
         self.worker.start()
 

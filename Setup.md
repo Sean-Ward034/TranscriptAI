@@ -3,7 +3,7 @@
 ## **Prerequisites**
 
 1. **Python Environment**
-   * Python 3.8 or newer
+   * Python 3.9.13 (recommended)
    * pip package manager
 
 2. **FFmpeg Installation**

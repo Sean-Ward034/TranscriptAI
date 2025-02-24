@@ -5,13 +5,11 @@ import os
 from docx import Document
 from docx.shared import Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+import subprocess
 
 from .ffmpeg_utils import convert_to_wav_ffmpeg, chunk_wav_file
 from .whisper_utils import load_whisper_model, transcribe_audio_segment, format_timecode
-
-# NEW: import our audio enhancement function
 from .audio_enhancement import enhance_audio
-
 
 class TranscriptionWorker(threading.Thread):
     """Process multiple files in a background thread."""
@@ -28,7 +26,7 @@ class TranscriptionWorker(threading.Thread):
         chunk_length: int = 300,
         log_queue: Optional[queue.Queue] = None,
         progress_queue: Optional[queue.Queue] = None,
-        enhance_audio: bool = False,  # <-- NEW: toggle for enhancement
+        enhance_audio: bool = False,
     ):
         super().__init__()
         self.input_files = input_files
@@ -44,7 +42,6 @@ class TranscriptionWorker(threading.Thread):
         self.stop_event = threading.Event()
         self.doc_messages = []
         
-        # NEW: store the user preference
         self.enhance_audio_flag = enhance_audio
 
     def _log(self, msg: str) -> None:
@@ -158,11 +155,10 @@ class TranscriptionWorker(threading.Thread):
                     self._log("Stop requested during chunk processing.")
                     break
                 
-                # NEW: Enhance audio if user selected
+                # Enhance audio if user selected
                 if self.enhance_audio_flag:
                     self._log(f"Enhancing chunk {chunk_idx}/{len(chunks)}...")
                     try:
-                        # Example: no custom sample_rate override or prop_decrease
                         enhanced_path = enhance_audio(chunk_path)
                         audio_to_transcribe = enhanced_path
                     except Exception as e:
