@@ -1,6 +1,6 @@
-# **Transcription Application (Kivy + Whisper)**
+# **Transcription Application (QT + Whisper)**
 
-A **cross-platform** transcription tool built with [Kivy](https://kivy.org/) and [OpenAI Whisper](https://github.com/openai/whisper). This application can:
+A **cross-platform** transcription tool built with [QT] and [OpenAI Whisper](https://github.com/openai/whisper). This application can:
 
 * **Convert** audio or video files (`.mp3`, `.wav`, `.m4a`, `.mp4`, `.mkv`, etc.) to `.wav` using [FFmpeg](https://ffmpeg.org).  
 * **Transcribe** the `.wav` file(s) using Whisper.  
@@ -16,9 +16,9 @@ project_root/
 │   ├─ ffmpeg_utils.py    # FFmpeg conversion and chunking
 │   ├─ whisper_utils.py   # Whisper model loading and transcription
 │   └─ transcription_worker.py  # Background processing thread
-├─ ui/                    # Kivy user interface
+├─ ui/                    # QT user interface
 │   ├─ main_gui.py        # Main application layout
-│   └─ app.py            # Kivy app class
+│   └─ app.py            # QT app class
 ├─ main.py               # Application entry point
 ├─ setup.py              # Package configuration
 └─ requirements.txt      # Dependencies
@@ -29,7 +29,7 @@ project_root/
 * **Python 3.8+** (tested primarily on 3.9+)
 * **FFmpeg** installed and on your system PATH (including `ffprobe`)
 * **Pip packages**:
-  * Kivy (>=2.1.0)
+  * QT
   * OpenAI Whisper
   * PyTorch (with CUDA support if you want GPU acceleration)
   * python-docx
