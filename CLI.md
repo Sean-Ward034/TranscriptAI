@@ -66,6 +66,26 @@ To run the application in CLI mode, include the `--mode CLI` flag when executing
   **Options:** Yes or No  
   **Default:** No
 
+- **--huggingface-token**  
+  HuggingFace token for accessing diarization models.  
+  **Note:** Required if diarization is enabled, unless the HUGGING_FACE_TOKEN environment variable is set.
+
+- **--min-speakers**  
+  Minimum number of speakers to detect in diarization.  
+  **Range:** 1-10  
+  **Default:** 1
+
+- **--max-speakers**  
+  Maximum number of speakers to detect in diarization.  
+  **Range:** 1-10  
+  **Default:** 2
+
+- **--segmentation**  
+  Segmentation parameter for diarization.  
+  **Range:** 0.1-5.0  
+  **Default:** 1.0  
+  Lower values merge segments, higher values create more segments.
+
 ## Example Commands
 
 ### Example 1: Basic Transcription
@@ -76,7 +96,36 @@ Run the transcription on two files using default settings:
 ### Example 2: Custom Transcription Settings
 Run with custom model, device, enhanced audio, and speaker diarization enabled:
   
-  python main.py --mode CLI --input-files "audio1.mp3" --output-dir "./transcripts" --model small --device cuda --sample-rate 22050 --channels 2 --chunk Yes --chunk-length 180 --enhance Yes --diarization Yes
+  python main.py --mode CLI --input-files "audio1.mp3" --output-dir "./transcripts" --model small --device cuda --sample-rate 22050 --channels 2 --chunk Yes --chunk-length 180 --enhance Yes --diarization Yes --huggingface-token "YOUR_TOKEN_HERE" --min-speakers 1 --max-speakers 2 --segmentation 1.0
+
+### Example 3: Optimized for Interview (2 speakers)
+Run with settings optimized for a two-person interview:
+
+  python main.py --mode CLI --input-files "interview.mp3" --output-dir "./transcripts" --diarization Yes --huggingface-token "YOUR_TOKEN_HERE" --min-speakers 1 --max-speakers 2 --segmentation 1.0
+
+### Example 4: Optimized for Single Speaker
+Run with settings optimized for a single speaker (lecture, monologue):
+
+  python main.py --mode CLI --input-files "lecture.mp3" --output-dir "./transcripts" --diarization Yes --huggingface-token "YOUR_TOKEN_HERE" --min-speakers 1 --max-speakers 1 --segmentation 0.5
+
+### Example 5: Optimized for Group Discussion
+Run with settings optimized for a group discussion or meeting:
+
+  python main.py --mode CLI --input-files "meeting.mp3" --output-dir "./transcripts" --diarization Yes --huggingface-token "YOUR_TOKEN_HERE" --min-speakers 2 --max-speakers 5 --segmentation 1.5
+
+## Diarization Settings Guide
+
+The diarization feature identifies different speakers in the audio. The settings can be tuned for different scenarios:
+
+- **min-speakers and max-speakers**:
+  - For interviews or podcasts with 2 speakers: min=1, max=2
+  - For single speaker recordings: min=1, max=1
+  - For group discussions or meetings: min=2, max=3-10 (depending on number of participants)
+
+- **segmentation**:
+  - Lower values (0.1-0.5): Fewer segments, may merge different speakers, faster processing
+  - Default (1.0): Balanced segmentation
+  - Higher values (1.5-5.0): More segments, better speaker separation, slower processing
 
 ## Additional Notes
 
@@ -88,5 +137,9 @@ Run with custom model, device, enhanced audio, and speaker diarization enabled:
 
 - **Logging and Progress:**  
   During execution, progress updates and log messages are printed to the console.
+
+- **HuggingFace Token:**  
+  To use speaker diarization, you need a HuggingFace token with access to the pyannote/speaker-diarization model.
+  You can set it using the --huggingface-token parameter or by setting the HUGGING_FACE_TOKEN environment variable.
 
 This CLI integration retains all the features provided in the GUI while offering a flexible command line alternative.
