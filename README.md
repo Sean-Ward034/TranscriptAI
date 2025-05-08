@@ -26,7 +26,7 @@ project_root/
 
 ## **Requirements**
 
-* **Python 3.8+** (tested primarily on 3.9+)
+* **Python 3.8+** (tested primarily on 3.9.13)
 * **FFmpeg** installed and on your system PATH (including `ffprobe`)
 * **Pip packages**:
   * QT
